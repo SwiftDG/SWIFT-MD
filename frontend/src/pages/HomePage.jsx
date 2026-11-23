@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "../lib/supabase";
 import AppShell from "../components/AppShell";
-import StudyDeck from "../components/StudyDeck";
+import CourseFinder from "../components/CourseFinder";
 
 const quickActions = [
   {
@@ -87,7 +87,7 @@ export default function HomePage() {
           <p className="swift-greeting">{greeting}</p>
         </section>
 
-        <StudyDeck />
+        <CourseFinder />
 
         <section className="swift-quick-actions">
           <div className="section-heading">
