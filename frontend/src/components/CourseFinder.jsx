@@ -4,8 +4,15 @@ import { supabase } from "../lib/supabase";
 import { getPracticeCourses } from "../lib/practice";
 
 const RECENT_KEY = "swift:recent-courses:v1";
-const EXAMPLES = ["GET 209", "fluid mechanics", "chemistry", "PHY 102"];
+const TYPE_ORDER = ["mcq", "german", "theory"];
 const TYPE_LABELS = { mcq: "MCQ", german: "Fill-in", theory: "Theory" };
+const LEVEL_NOTES = {
+  100: "Sciences, maths and first engineering courses",
+  200: "Core engineering and departmental courses",
+  300: "Advanced departmental courses",
+  400: "Final-year and specialist courses",
+  500: "Final-year and specialist courses",
+};
 
 // Typo-tolerant matching: "get209", "GET-209", "thermodynamcs" all work.
 function normalise(value) {
@@ -72,42 +79,22 @@ function readRecent() {
 
 function rememberCourse(id) {
   try {
-    const next = [id, ...readRecent().filter((item) => item !== id)].slice(0, 4);
+    const next = [id, ...readRecent().filter((item) => item !== id)].slice(0, 6);
     window.localStorage.setItem(RECENT_KEY, JSON.stringify(next));
   } catch {
     // Private browsing should never block opening a course.
   }
 }
 
-function CourseRow({ course, active, onOpen, onHover }) {
-  const banks = course.banks || [];
-  return (
-    <li>
-      <button
-        type="button"
-        className={`finder-row ${active ? "is-active" : ""}`}
-        onClick={() => onOpen(course)}
-        onMouseEnter={onHover}
-      >
-        <span className="finder-code">{course.code}</span>
-        <span className="finder-title">{course.title}</span>
-        <span className="finder-meta">
-          {course.materialCount > 0 && (
-            <span>
-              {course.materialCount} {course.materialCount === 1 ? "material" : "materials"}
-            </span>
-          )}
-          {banks.length > 0 && (
-            <span className="finder-banks" aria-label="Practice available">
-              {banks.map((type) => (
-                <span key={type}>{TYPE_LABELS[type] || type}</span>
-              ))}
-            </span>
-          )}
-        </span>
-      </button>
-    </li>
-  );
+function Badges({ banks }) {
+  if (!banks.length) {
+    return <span className="home-badge is-muted">Practice coming soon</span>;
+  }
+  return banks.map((type) => (
+    <span key={type} className="home-badge">
+      {TYPE_LABELS[type] || type}
+    </span>
+  ));
 }
 
 export default function CourseFinder({ greeting }) {
@@ -152,25 +139,16 @@ export default function CourseFinder({ greeting }) {
         if (!active) return;
         const byCode = {};
         for (const course of catalog || []) {
-          byCode[course.code] = [
-            ...new Set((course.banks || []).map((bank) => bank.type)),
-          ].sort((a, b) => Object.keys(TYPE_LABELS).indexOf(a) - Object.keys(TYPE_LABELS).indexOf(b));
+          byCode[course.code] = TYPE_ORDER.filter((type) =>
+            (course.banks || []).some((bank) => bank.type === type)
+          );
         }
         setBanksByCode(byCode);
       })
       .catch(() => {});
 
-    function focusOnSlash(event) {
-      if (event.key === "/" && document.activeElement !== inputRef.current) {
-        event.preventDefault();
-        inputRef.current?.focus();
-      }
-    }
-    window.addEventListener("keydown", focusOnSlash);
-
     return () => {
       active = false;
-      window.removeEventListener("keydown", focusOnSlash);
     };
   }, []);
 
@@ -196,12 +174,27 @@ export default function CourseFinder({ greeting }) {
   }, [enriched, query]);
 
   const recent = useMemo(
-    () => recentIds.map((id) => enriched.find((course) => course.id === id)).filter(Boolean),
+    () => recentIds.map((id) => enriched.find((course) => course.id === id)).filter(Boolean).slice(0, 3),
     [recentIds, enriched]
   );
 
+  // With no history yet, suggest the best-stocked courses instead.
+  const cards = useMemo(() => {
+    if (recent.length) return recent;
+    return [...enriched]
+      .sort((a, b) => b.banks.length - a.banks.length || b.materialCount - a.materialCount)
+      .slice(0, 3);
+  }, [recent, enriched]);
+
+  const ready = useMemo(() => {
+    const levels = new Set(cards.map((course) => course.level));
+    const full = enriched.filter((course) => course.banks.length === TYPE_ORDER.length);
+    const nearby = full.filter((course) => levels.has(course.level));
+    return [...nearby, ...full.filter((course) => !levels.has(course.level))].slice(0, 5);
+  }, [enriched, cards]);
+
   const levels = useMemo(
-    () => [...new Set(courses.map((course) => String(course.level)).filter(Boolean))].sort(),
+    () => [...new Set(courses.map((course) => Number(course.level)).filter(Boolean))].sort((a, b) => a - b),
     [courses]
   );
 
@@ -211,6 +204,10 @@ export default function CourseFinder({ greeting }) {
   }
 
   function handleKeyDown(event) {
+    if (event.key === "Escape") {
+      setQuery("");
+      return;
+    }
     if (!results.length) return;
     if (event.key === "ArrowDown") {
       event.preventDefault();
@@ -218,114 +215,146 @@ export default function CourseFinder({ greeting }) {
     } else if (event.key === "ArrowUp") {
       event.preventDefault();
       setActiveIndex((index) => (index - 1 + results.length) % results.length);
-    } else if (event.key === "Enter") {
-      event.preventDefault();
-      openCourse(results[Math.min(activeIndex, results.length - 1)]);
-    } else if (event.key === "Escape") {
-      setQuery("");
     }
+  }
+
+  function handleSubmit(event) {
+    event.preventDefault();
+    if (results.length) openCourse(results[Math.min(activeIndex, results.length - 1)]);
   }
 
   const hasQuery = normalise(query).length > 0;
 
   return (
-    <section className="finder" aria-labelledby="finder-label">
-      {greeting && <p className="finder-greeting">{greeting}</p>}
+    <div className="home-dash">
+      <section className="home-hero" aria-labelledby="home-hero-title">
+        <p className="home-hero-greeting">{greeting}</p>
+        <h1 id="home-hero-title">What are you studying?</h1>
 
-      <label id="finder-label" htmlFor="finder-input" className="sr-only">
-        What are you studying?
-      </label>
-      <div className="finder-field">
-        <input
-          id="finder-input"
-          ref={inputRef}
-          type="search"
-          autoComplete="off"
-          spellCheck="false"
-          placeholder="What are you studying?"
-          value={query}
-          onChange={(event) => {
-            setQuery(event.target.value);
-            setActiveIndex(0);
-          }}
-          onKeyDown={handleKeyDown}
-          aria-controls="finder-results"
-        />
-      </div>
-      <p className="finder-hint">
-        A course code or title. Spelling doesn&rsquo;t have to be perfect.
-      </p>
+        <form className="home-search" role="search" onSubmit={handleSubmit}>
+          <label htmlFor="home-search-input" className="sr-only">
+            Search courses
+          </label>
+          <svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+            <circle cx="11" cy="11" r="7" />
+            <path d="M20 20l-3.5-3.5" />
+          </svg>
+          <input
+            id="home-search-input"
+            ref={inputRef}
+            type="search"
+            autoComplete="off"
+            spellCheck="false"
+            placeholder="Course code or title"
+            value={query}
+            onChange={(event) => {
+              setQuery(event.target.value);
+              setActiveIndex(0);
+            }}
+            onKeyDown={handleKeyDown}
+            aria-controls="home-search-results"
+          />
+          <button type="submit">Find course</button>
 
-      {hasQuery ? (
-        <div className="finder-panel" id="finder-results" aria-live="polite">
-          {results.length > 0 ? (
-            <ol className="finder-list">
-              {results.map((course, index) => (
-                <CourseRow
-                  key={course.id}
-                  course={course}
-                  active={index === activeIndex}
-                  onOpen={openCourse}
-                  onHover={() => setActiveIndex(index)}
-                />
-              ))}
-            </ol>
-          ) : (
-            <p className="finder-empty">
-              {status === "loading"
-                ? "Loading courses…"
-                : `No course matches “${query.trim()}”. Try the course code, like GET 209.`}
-            </p>
-          )}
-        </div>
-      ) : (
-        <div className="finder-panel finder-start">
-          {recent.length > 0 && (
-            <div className="finder-group">
-              <h2>Jump back in</h2>
-              <ol className="finder-list">
-                {recent.map((course) => (
-                  <CourseRow key={course.id} course={course} onOpen={openCourse} />
-                ))}
-              </ol>
+          {hasQuery && (
+            <div className="home-results" id="home-search-results" aria-live="polite">
+              {results.length > 0 ? (
+                <ol>
+                  {results.map((course, index) => (
+                    <li key={course.id}>
+                      <button
+                        type="button"
+                        className={index === activeIndex ? "is-active" : ""}
+                        onClick={() => openCourse(course)}
+                        onMouseEnter={() => setActiveIndex(index)}
+                      >
+                        <span className="home-results-code">{course.code}</span>
+                        <span className="home-results-title">{course.title}</span>
+                        <span className="home-results-meta">
+                          {course.materialCount > 0 && `${course.materialCount} materials`}
+                        </span>
+                      </button>
+                    </li>
+                  ))}
+                </ol>
+              ) : (
+                <p className="home-results-empty">
+                  {status === "loading"
+                    ? "Loading courses…"
+                    : `No course matches “${query.trim()}”. Try the course code, like GET 209.`}
+                </p>
+              )}
             </div>
           )}
+        </form>
+        <p className="home-hero-hint">Try GET 209 or &ldquo;fluid mechanics&rdquo;. Spelling doesn&rsquo;t have to be perfect.</p>
+      </section>
 
-          <div className="finder-group finder-try">
-            <h2>Try</h2>
-            <div className="finder-chips">
-              {EXAMPLES.map((example) => (
+      <div className="home-columns">
+        <div className="home-main">
+          <section aria-labelledby="home-cards-title">
+            <h2 id="home-cards-title" className="home-section-title">
+              {recent.length ? "Continue studying" : "Popular courses"}
+            </h2>
+            <div className="home-card-grid">
+              {cards.map((course) => (
+                <button key={course.id} type="button" className="home-card" onClick={() => openCourse(course)}>
+                  <span className="home-card-top">
+                    <span className="home-card-code">{course.code}</span>
+                    <span className="home-card-level">{course.level} Level</span>
+                  </span>
+                  <span className="home-card-title">{course.title}</span>
+                  <span className="home-card-badges">
+                    <Badges banks={course.banks} />
+                  </span>
+                  <span className="home-card-count">
+                    {course.materialCount} {course.materialCount === 1 ? "material" : "materials"}
+                  </span>
+                </button>
+              ))}
+              {status === "loading" && !cards.length && <p className="home-note">Loading courses…</p>}
+              {status === "error" && <p className="home-note">Courses didn&rsquo;t load. Refresh the page or browse a level below.</p>}
+            </div>
+          </section>
+
+          <section aria-labelledby="home-levels-title">
+            <h2 id="home-levels-title" className="home-section-title">Browse by level</h2>
+            <div className="home-level-grid">
+              {(levels.length ? levels : [100, 200, 300]).map((level, index) => (
                 <button
-                  key={example}
+                  key={level}
                   type="button"
-                  onClick={() => {
-                    setQuery(example);
-                    setActiveIndex(0);
-                    inputRef.current?.focus();
-                  }}
+                  className={`home-level home-level-${Math.min(index, 2)}`}
+                  onClick={() => navigate(`/level/${level}`)}
                 >
-                  {example}
+                  <span className="home-level-name">{level} Level</span>
+                  <span className="home-level-note">{LEVEL_NOTES[level] || "Courses at this level"}</span>
                 </button>
               ))}
             </div>
-          </div>
-
-          <div className="finder-group finder-try">
-            <h2>Browse a level</h2>
-            <div className="finder-chips">
-              {(levels.length ? levels : ["100", "200", "300"]).map((level) => (
-                <button key={level} type="button" onClick={() => navigate(`/level/${level}`)}>
-                  {level} Level
-                </button>
-              ))}
-            </div>
-          </div>
+          </section>
         </div>
-      )}
 
-      {status === "error" && (
-        <p className="finder-empty">Courses didn&rsquo;t load. Browse a level instead.</p>
-      )}
-    </section>
+        <aside className="home-aside" aria-labelledby="home-ready-title">
+          <h2 id="home-ready-title" className="home-section-title">Ready to practise</h2>
+          <p className="home-aside-note">Courses with MCQ, fill-in and theory questions.</p>
+          <ul>
+            {ready.map((course) => (
+              <li key={course.id}>
+                <button type="button" onClick={() => navigate(`/test/${encodeURIComponent(course.code)}`)}>
+                  <span>
+                    <strong>{course.code}</strong> {course.title}
+                  </span>
+                  <span className="home-aside-start">Start</span>
+                </button>
+              </li>
+            ))}
+          </ul>
+          <button type="button" className="home-aside-all" onClick={() => navigate("/practice")}>
+            All practice
+          </button>
+        </aside>
+      </div>
+    </div>
   );
 }
