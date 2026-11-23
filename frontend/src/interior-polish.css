@@ -83,108 +83,6 @@
   color: var(--swift-muted);
 }
 
-.swift-home-shell .study-deck {
-  position: relative;
-  overflow: hidden;
-  border-color: rgba(255, 255, 255, 0.16);
-  border-radius: 6px;
-  background: var(--swift-navy);
-  box-shadow: var(--swift-shadow);
-}
-
-.swift-home-shell .study-deck::before {
-  width: 46%;
-  height: 1px;
-  position: absolute;
-  top: 34px;
-  left: -9%;
-  background: rgba(166, 178, 255, 0.7);
-  content: "";
-  transform: rotate(-11deg);
-}
-
-.swift-home-shell .study-deck-copy {
-  position: relative;
-  z-index: 1;
-}
-
-.swift-home-shell .study-deck .swift-eyebrow,
-.swift-home-shell .study-deck h2,
-.swift-home-shell .study-deck-description {
-  color: #fff;
-}
-
-.swift-home-shell .study-deck-description {
-  color: rgba(255, 255, 255, 0.7);
-}
-
-.swift-home-shell .level-selector-button {
-  border-color: rgba(255, 255, 255, 0.24);
-  border-radius: 999px;
-  background: rgba(255, 255, 255, 0.08);
-  color: rgba(255, 255, 255, 0.76);
-}
-
-.swift-home-shell .level-selector-button:hover,
-.swift-home-shell .level-selector-button.is-selected {
-  border-color: #fff;
-  background: #fff;
-  color: var(--swift-navy);
-}
-
-.swift-home-shell .study-deck .swift-primary-button {
-  gap: 14px;
-  padding: 8px 9px 8px 18px;
-  border-color: rgba(255, 255, 255, 0.68);
-  border-radius: 999px;
-  background: #fff;
-  color: var(--swift-navy);
-  box-shadow: 0 12px 30px rgba(0, 0, 30, 0.24);
-}
-
-.swift-home-shell .study-deck .swift-primary-button span {
-  width: 31px;
-  height: 31px;
-  display: grid;
-  place-items: center;
-  border-radius: 50%;
-  background: var(--swift-navy);
-  color: #fff;
-  transition: transform 180ms ease;
-}
-
-.swift-home-shell .study-deck .swift-primary-button:hover {
-  border-color: #fff;
-  background: var(--swift-paper);
-  color: var(--swift-navy);
-  transform: translateY(-2px);
-}
-
-.swift-home-shell .study-deck .swift-primary-button:hover span {
-  transform: translateX(2px);
-}
-
-.swift-home-shell .deck-stage {
-  border-color: rgba(255, 255, 255, 0.22);
-  border-radius: 4px;
-  background: #11115b;
-}
-
-.swift-home-shell .deck-card {
-  border-radius: 4px;
-}
-
-.swift-home-shell .deck-card.is-selected {
-  border-color: var(--swift-blue);
-  box-shadow: 0 24px 46px rgba(0, 0, 30, 0.3);
-}
-
-.swift-home-shell .deck-caption,
-.swift-home-shell .deck-caption strong {
-  color: #fff;
-  text-shadow: 0 1px 12px var(--swift-navy);
-}
-
 .swift-home-shell .swift-quick-actions .section-heading {
   border-bottom-color: var(--swift-line);
 }
@@ -231,6 +129,159 @@
   color: var(--swift-navy);
 }
 
+/* Course finder: replaces the old level-picker "study deck" on /home. */
+.swift-home-shell .course-finder {
+  padding: 40px 44px 30px;
+  border: 1px solid var(--swift-line);
+  border-radius: 6px;
+  background: var(--swift-white);
+  box-shadow: var(--swift-shadow);
+}
+
+.swift-home-shell .course-finder-head {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 32px;
+  align-items: baseline;
+  justify-content: space-between;
+}
+
+.swift-home-shell .course-finder-head h2 {
+  margin: 0;
+  color: var(--swift-navy);
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(2rem, 3.4vw, 2.9rem);
+  font-weight: 400;
+  letter-spacing: -0.045em;
+  line-height: 1.05;
+}
+
+.swift-home-shell .course-finder-head p {
+  margin: 0;
+  color: var(--swift-muted);
+  font-size: 0.95rem;
+}
+
+.swift-home-shell .course-finder-form {
+  position: relative;
+  margin-top: 28px;
+}
+
+.swift-home-shell .course-finder-form input {
+  width: 100%;
+  padding: 16px 52px 14px 0;
+  border: 0;
+  border-bottom: 2px solid var(--swift-navy);
+  border-radius: 0;
+  background: transparent;
+  color: var(--swift-navy);
+  font-size: clamp(1.15rem, 2vw, 1.45rem);
+  outline: none;
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+.swift-home-shell .course-finder-form input::placeholder {
+  color: #9aa0ae;
+}
+
+.swift-home-shell .course-finder-form input:focus {
+  border-bottom-color: #5368ed;
+}
+
+.swift-home-shell .course-finder-form input::-webkit-search-cancel-button {
+  display: none;
+}
+
+.swift-home-shell .course-finder-form kbd {
+  position: absolute;
+  right: 0;
+  bottom: 14px;
+  padding: 2px 8px;
+  border: 1px solid var(--swift-line);
+  border-radius: 4px;
+  color: var(--swift-muted);
+  font-family: inherit;
+  font-size: 0.8rem;
+}
+
+.swift-home-shell .course-finder-results {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.swift-home-shell .course-finder-results button {
+  width: 100%;
+  display: grid;
+  grid-template-columns: 92px 1fr auto;
+  gap: 18px;
+  align-items: baseline;
+  padding: 15px 4px;
+  border: 0;
+  border-bottom: 1px solid var(--swift-line);
+  background: transparent;
+  color: var(--swift-navy);
+  text-align: left;
+  cursor: pointer;
+  transition: background 160ms ease, padding 160ms ease;
+}
+
+.swift-home-shell .course-finder-results button:hover,
+.swift-home-shell .course-finder-results button:focus-visible {
+  padding-left: 12px;
+  background: var(--swift-paper);
+  outline: none;
+}
+
+.swift-home-shell .course-finder-code {
+  font-family: ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+  font-size: 0.88rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+.swift-home-shell .course-finder-title {
+  font-size: 1rem;
+}
+
+.swift-home-shell .course-finder-level {
+  color: var(--swift-muted);
+  font-size: 0.8rem;
+}
+
+.swift-home-shell .course-finder-empty {
+  padding: 16px 4px;
+  color: var(--swift-muted);
+}
+
+.swift-home-shell .course-finder-levels {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 20px;
+  align-items: baseline;
+  margin-top: 24px;
+  color: var(--swift-muted);
+  font-size: 0.9rem;
+}
+
+.swift-home-shell .course-finder-levels button {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--swift-navy);
+  font: inherit;
+  font-weight: 600;
+  text-decoration: underline;
+  text-decoration-color: var(--swift-line);
+  text-underline-offset: 5px;
+  cursor: pointer;
+}
+
+.swift-home-shell .course-finder-levels button:hover {
+  text-decoration-color: var(--swift-navy);
+}
+
 @media (max-width: 760px) {
   .swift-home-shell {
     background: var(--swift-paper);
@@ -256,8 +307,16 @@
     padding-bottom: 26px;
   }
 
-  .swift-home-shell .study-deck {
-    padding: 34px 22px;
+  .swift-home-shell .course-finder {
+    padding: 28px 20px 22px;
+  }
+
+  .swift-home-shell .course-finder-results button {
+    grid-template-columns: 74px 1fr;
+  }
+
+  .swift-home-shell .course-finder-level {
+    display: none;
   }
 
   .swift-home-shell .quick-action-grid {
