@@ -129,180 +129,358 @@
   color: var(--swift-navy);
 }
 
-/* Course finder: the home page's search, typed straight into the headline. */
-.swift-home-shell .finder {
-  max-width: 980px;
-  padding-top: 12px;
+/* Home dashboard: navy welcome band with search, then course cards. */
+.swift-home-shell .home-dash {
+  display: grid;
+  gap: 40px;
 }
 
-.swift-home-shell .finder-greeting {
-  margin: 0 0 14px;
-  color: var(--swift-muted);
+.swift-home-shell .home-hero {
+  position: relative;
+  padding: clamp(32px, 5vw, 56px) clamp(24px, 5vw, 56px) clamp(32px, 4vw, 44px);
+  border-radius: 20px;
+  background:
+    repeating-linear-gradient(0deg, rgba(130, 147, 255, 0.1) 0, rgba(130, 147, 255, 0.1) 1px, transparent 1px, transparent 36px),
+    var(--swift-navy);
+  color: #ffffff;
+}
+
+.swift-home-shell .home-hero-greeting {
+  margin: 0 0 10px;
+  color: rgba(255, 255, 255, 0.75);
   font-size: 1.05rem;
 }
 
-.swift-home-shell .finder-field {
-  position: relative;
+.swift-home-shell .home-hero h1 {
+  margin: 0;
+  color: #ffffff;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(2.4rem, 5vw, 4rem);
+  font-weight: 400;
+  letter-spacing: -0.04em;
+  line-height: 1.02;
 }
 
-.swift-home-shell .finder-field input {
-  width: 100%;
-  padding: 0 0 18px;
+.swift-home-shell .home-search {
+  position: relative;
+  z-index: 5;
+  max-width: 760px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 28px;
+  padding: 7px 7px 7px 20px;
+  border-radius: 999px;
+  background: #ffffff;
+  color: var(--swift-navy);
+  box-shadow: 0 18px 40px rgba(0, 0, 30, 0.35);
+}
+
+.swift-home-shell .home-search svg {
+  flex: none;
+}
+
+.swift-home-shell .home-search input {
+  flex: 1;
+  min-width: 0;
+  padding: 12px 0;
   border: 0;
-  border-bottom: 5px solid var(--swift-navy);
-  border-radius: 0;
   background: transparent;
   color: var(--swift-navy);
-  font-family: Georgia, "Times New Roman", serif;
-  font-size: clamp(2.6rem, 6.4vw, 5.4rem);
-  font-weight: 400;
-  letter-spacing: -0.055em;
-  line-height: 1.05;
-  caret-color: #5368ed;
+  font: inherit;
+  font-size: 1.08rem;
   outline: none;
   -webkit-appearance: none;
   appearance: none;
 }
 
-.swift-home-shell .finder-field input::placeholder {
-  color: var(--swift-navy);
-  opacity: 1;
-}
-
-.swift-home-shell .finder-field input:focus::placeholder {
-  color: #b9bccb;
-}
-
-.swift-home-shell .finder-field input:focus {
-  border-bottom-color: #5368ed;
-}
-
-.swift-home-shell .finder-field input::-webkit-search-cancel-button {
+.swift-home-shell .home-search input::-webkit-search-cancel-button {
   display: none;
 }
 
-.swift-home-shell .finder-hint {
-  margin: 14px 0 0;
-  color: var(--swift-muted);
+.swift-home-shell .home-search:focus-within {
+  box-shadow: 0 0 0 3px #8293ff, 0 18px 40px rgba(0, 0, 30, 0.35);
+}
+
+.swift-home-shell .home-search > button {
+  flex: none;
+  padding: 13px 22px;
+  border: 0;
+  border-radius: 999px;
+  background: #5368ed;
+  color: #ffffff;
+  font: inherit;
   font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
 }
 
-.swift-home-shell .finder-panel {
-  margin-top: 40px;
+.swift-home-shell .home-search > button:hover {
+  background: #3f52d6;
 }
 
-.swift-home-shell .finder-start {
-  display: grid;
-  gap: 34px;
+.swift-home-shell .home-hero-hint {
+  margin: 12px 0 0 6px;
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 0.88rem;
 }
 
-.swift-home-shell .finder-group h2 {
-  margin: 0 0 12px;
-  color: var(--swift-navy);
-  font-size: 0.95rem;
-  font-weight: 650;
+.swift-home-shell .home-results {
+  position: absolute;
+  top: calc(100% + 10px);
+  left: 0;
+  right: 0;
+  overflow: hidden;
+  border-radius: 16px;
+  background: #ffffff;
+  box-shadow: 0 24px 60px rgba(0, 0, 40, 0.28);
 }
 
-.swift-home-shell .finder-list {
+.swift-home-shell .home-results ol {
   margin: 0;
-  padding: 0;
-  border-top: 1px solid var(--swift-line);
+  padding: 6px;
   list-style: none;
 }
 
-.swift-home-shell .finder-row {
+.swift-home-shell .home-results li button {
   width: 100%;
   display: grid;
-  grid-template-columns: 7.5rem minmax(0, 1fr) auto;
-  gap: 24px;
+  grid-template-columns: 6.5rem minmax(0, 1fr) auto;
+  gap: 16px;
   align-items: baseline;
-  padding: 20px 14px;
+  padding: 13px 14px;
   border: 0;
-  border-bottom: 1px solid var(--swift-line);
+  border-radius: 10px;
   background: transparent;
   color: var(--swift-navy);
+  font: inherit;
   text-align: left;
   cursor: pointer;
 }
 
-.swift-home-shell .finder-row.is-active,
-.swift-home-shell .finder-row:hover,
-.swift-home-shell .finder-row:focus-visible {
-  background: var(--swift-white);
-  box-shadow: inset 4px 0 0 #5368ed;
+.swift-home-shell .home-results li button.is-active,
+.swift-home-shell .home-results li button:focus-visible {
+  background: #eef0ff;
   outline: none;
 }
 
-.swift-home-shell .finder-code {
-  font-size: 1.05rem;
+.swift-home-shell .home-results-code {
   font-weight: 700;
-  font-variant-numeric: tabular-nums;
 }
 
-.swift-home-shell .finder-title {
-  font-family: Georgia, "Times New Roman", serif;
-  font-size: 1.35rem;
-  letter-spacing: -0.02em;
-  line-height: 1.2;
-}
-
-.swift-home-shell .finder-meta {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px 14px;
-  align-items: center;
-  justify-content: flex-end;
+.swift-home-shell .home-results-meta {
   color: var(--swift-muted);
   font-size: 0.85rem;
 }
 
-.swift-home-shell .finder-banks {
-  display: inline-flex;
-  gap: 6px;
+.swift-home-shell .home-results-empty {
+  margin: 0;
+  padding: 18px 20px;
+  color: var(--swift-muted);
 }
 
-.swift-home-shell .finder-banks span {
-  padding: 3px 9px;
-  border-radius: 999px;
-  background: #e9ecff;
-  color: #2b2f8f;
-  font-size: 0.78rem;
-  font-weight: 600;
-}
-
-.swift-home-shell .finder-chips {
+.swift-home-shell .home-columns {
   display: flex;
   flex-wrap: wrap;
-  gap: 10px;
+  gap: 28px;
 }
 
-.swift-home-shell .finder-chips button {
-  padding: 10px 18px;
+.swift-home-shell .home-main {
+  flex: 999 1 600px;
+  min-width: 0;
+  display: grid;
+  gap: 36px;
+}
+
+.swift-home-shell .home-section-title {
+  margin: 0 0 14px;
+  color: var(--swift-navy);
+  font-size: 1.05rem;
+  font-weight: 700;
+}
+
+.swift-home-shell .home-card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+  gap: 16px;
+}
+
+.swift-home-shell .home-card {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 20px;
   border: 1px solid var(--swift-line);
-  border-radius: 999px;
-  background: var(--swift-white);
+  border-radius: 16px;
+  background: #ffffff;
   color: var(--swift-navy);
   font: inherit;
-  font-size: 0.95rem;
+  text-align: left;
   cursor: pointer;
+  transition: border-color 160ms ease, box-shadow 160ms ease;
 }
 
-.swift-home-shell .finder-chips button:hover,
-.swift-home-shell .finder-chips button:focus-visible {
+.swift-home-shell .home-card:hover,
+.swift-home-shell .home-card:focus-visible {
   border-color: var(--swift-navy);
+  box-shadow: var(--swift-shadow);
   outline: none;
 }
 
-.swift-home-shell .finder-empty {
-  margin: 0;
-  padding: 22px 0;
-  border-top: 1px solid var(--swift-line);
-  color: var(--swift-muted);
-  font-size: 1rem;
+.swift-home-shell .home-card-top {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
 }
 
-.swift-home-shell .finder + .swift-quick-actions {
-  margin-top: 88px;
+.swift-home-shell .home-card-code {
+  font-weight: 700;
+}
+
+.swift-home-shell .home-card-level,
+.swift-home-shell .home-card-count {
+  color: var(--swift-muted);
+  font-size: 0.82rem;
+}
+
+.swift-home-shell .home-card-title {
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 1.3rem;
+  line-height: 1.2;
+}
+
+.swift-home-shell .home-card-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: auto;
+}
+
+.swift-home-shell .home-badge {
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: #e9ecff;
+  color: #2b2f8f;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.swift-home-shell .home-badge.is-muted {
+  background: #efeff3;
+  color: #555b6e;
+}
+
+.swift-home-shell .home-note {
+  margin: 0;
+  color: var(--swift-muted);
+}
+
+.swift-home-shell .home-level-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+  gap: 16px;
+}
+
+.swift-home-shell .home-level {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 20px;
+  border: 0;
+  border-radius: 16px;
+  color: #ffffff;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.swift-home-shell .home-level-0 { background: var(--swift-navy); }
+.swift-home-shell .home-level-1 { background: #2b2f8f; }
+.swift-home-shell .home-level-2 { background: #4152d0; }
+
+.swift-home-shell .home-level:hover,
+.swift-home-shell .home-level:focus-visible {
+  outline: 3px solid #8293ff;
+  outline-offset: 2px;
+}
+
+.swift-home-shell .home-level-name {
+  font-size: 1.35rem;
+  font-weight: 700;
+}
+
+.swift-home-shell .home-level-note {
+  color: rgba(255, 255, 255, 0.82);
+  font-size: 0.85rem;
+}
+
+.swift-home-shell .home-aside {
+  flex: 1 1 300px;
+  min-width: 0;
+  align-self: flex-start;
+  display: flex;
+  flex-direction: column;
+  padding: 22px;
+  border: 1px solid var(--swift-line);
+  border-radius: 16px;
+  background: #ffffff;
+}
+
+.swift-home-shell .home-aside .home-section-title {
+  margin-bottom: 4px;
+}
+
+.swift-home-shell .home-aside-note {
+  margin: 0 0 12px;
+  color: var(--swift-muted);
+  font-size: 0.85rem;
+}
+
+.swift-home-shell .home-aside ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.swift-home-shell .home-aside li button {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  padding: 13px 0;
+  border: 0;
+  border-top: 1px solid #eceef4;
+  background: transparent;
+  color: var(--swift-navy);
+  font: inherit;
+  font-size: 0.9rem;
+  text-align: left;
+  cursor: pointer;
+}
+
+.swift-home-shell .home-aside-start {
+  flex: none;
+  color: #3f52d6;
+  font-weight: 600;
+}
+
+.swift-home-shell .home-aside li button:hover .home-aside-start,
+.swift-home-shell .home-aside li button:focus-visible .home-aside-start {
+  text-decoration: underline;
+}
+
+.swift-home-shell .home-aside-all {
+  margin-top: 10px;
+  padding: 12px;
+  border: 0;
+  border-radius: 10px;
+  background: var(--swift-navy);
+  color: #ffffff;
+  font: inherit;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
 }
 
 @media (max-width: 760px) {
@@ -330,28 +508,23 @@
     padding-bottom: 26px;
   }
 
-  .swift-home-shell .finder-field input {
-    border-bottom-width: 4px;
-    font-size: clamp(2.1rem, 10.5vw, 2.8rem);
+  .swift-home-shell .home-hero {
+    border-radius: 16px;
   }
 
-  .swift-home-shell .finder-panel {
-    margin-top: 28px;
+  .swift-home-shell .home-search {
+    flex-wrap: wrap;
+    padding: 6px 6px 6px 16px;
+    border-radius: 18px;
   }
 
-  .swift-home-shell .finder-row {
+  .swift-home-shell .home-search > button {
+    width: 100%;
+  }
+
+  .swift-home-shell .home-results li button {
     grid-template-columns: 1fr;
-    gap: 4px;
-    padding: 16px 10px;
-  }
-
-  .swift-home-shell .finder-meta {
-    justify-content: flex-start;
-    margin-top: 6px;
-  }
-
-  .swift-home-shell .finder + .swift-quick-actions {
-    margin-top: 56px;
+    gap: 2px;
   }
 
 
